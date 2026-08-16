@@ -35,8 +35,8 @@
   .col-headers th { background: #0d3349; color: #ffffff; font-family: "Oswald", sans-serif; font-size: 10px; font-weight: 600; text-align: center; padding: 7px 3px; letter-spacing: 0.3px; border-bottom: 2px solid #00c8e0; }
   .col-headers th.left { text-align: left; padding-left: 8px; }
 
-  tbody tr:nth-child(even) { background: #eaf6fd; }
-  tbody tr:nth-child(odd)  { background: #ffffff; }
+  tbody tr.pair-a { background: #ffffff; }
+  tbody tr.pair-b { background: #eaf6fd; }
   td { padding: 5px 3px; text-align: center; color: #1a1a2e; border-bottom: 1px solid #e4eef5; }
   td.tm-cell   { font-weight: 600; color: #0d3349; text-align: left; padding-left: 8px; font-family: "Oswald", sans-serif; }
   td.name-cell { font-weight: 600; color: #000; text-align: left; padding-left: 6px; }
@@ -104,11 +104,11 @@
     return "rgb(" + r + "," + g + "," + b + ")";
   }
 
-  function fmtNum(v) {
+  function fmtNum(v, isPct) {
     var n = parseFloat(String(v).replace("%", ""));
     if (isNaN(n)) return "N/A";
-    if (Math.abs(n) > 0 && Math.abs(n) < 1) return (n * 100).toFixed(0) + "%";
-    return (Math.round(n) === n) ? String(n) : n.toFixed(1);
+    if (isPct) return (n <= 1 ? n * 100 : n).toFixed(0) + "%";
+    return (Math.round(n) === n) ? String(n) : n.toFixed(2);
   }
 
   function render(d) {
@@ -161,12 +161,16 @@
 
     var tbody = document.getElementById("table-body");
     tbody.innerHTML = "";
+    var pairIdx = {}, pairCount = 0;
     rows.forEach(function (row) {
       var tr = document.createElement("tr");
+      var pk = [String(row[0]), String(row[firstStat - 1])].sort().join("|");
+      if (!(pk in pairIdx)) pairIdx[pk] = pairCount++;
+      tr.className = (pairIdx[pk] % 2 === 0) ? "pair-a" : "pair-b";
       row.forEach(function (val, ci) {
         var td = document.createElement("td");
         if (numeric.indexOf(ci) !== -1) {
-          td.textContent = fmtNum(val);
+          td.textContent = fmtNum(val, /%/.test(headers[ci] || ""));
           td.className = "cs";
           var n = parseFloat(String(val).replace("%", ""));
           if (!isNaN(n)) td.style.background = getColor(n, colMin[ci], colMax[ci]);
