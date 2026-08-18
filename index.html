@@ -209,7 +209,7 @@
       try { render(d); } catch (e) { fail(); }
     };
     s.onerror = function () { clearTimeout(timer); fail(); };
-    timer = setTimeout(function () { if (window[cb]) { delete window[cb]; fail(); } }, 12000);
+    timer = setTimeout(function () { if (window[cb]) { delete window[cb]; fail(); } }, 30000);
     s.src = DATA_URL + "?pos=" + POS.toLowerCase() + "&callback=" + cb;
     document.body.appendChild(s);
   }
