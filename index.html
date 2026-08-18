@@ -38,9 +38,9 @@
   tbody tr.pair-a { background: #ffffff; }
   tbody tr.pair-b { background: #eaf6fd; }
    td { padding: 6px 3px; text-align: center; color: #1a1a2e; border-bottom: 1px solid #e4eef5; font-size: 12px; }
-  td.tm-cell   { font-weight: 600; color: #0d3349; text-align: left; padding-left: 8px; font-family: "Oswald", sans-serif; font-size: 10.5px; }
-  td.name-cell { font-size: 11.5px; }
-  td.opp-cell  { font-size: 10.5px; }
+  td.tm-cell   { font-weight: 700; color: #0d3349; text-align: left; padding-left: 10px; font-family: "Oswald", sans-serif; font-size: 12px; letter-spacing: 0.3px; }
+  td.name-cell { font-size: 13px; font-weight: 600; color: #0d1b2a; }
+  td.opp-cell  { font-size: 11.5px; font-weight: 600; color: #5a6b7a; }
   td.cs        { font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; }
 
   #loading, #error-msg { padding: 40px; text-align: center; color: #64748b; font-size: 14px; }
@@ -113,7 +113,8 @@
 
   function render(d) {
     if (d.error) { throw new Error(d.error); }
-
+    
+    document.getElementById("card").style.width = (d.cardWidth || 1000) + "px";
     document.getElementById("title-pos").textContent = (d.title || "NFL TARGETS").replace("NFL ", "NFL ");
     document.getElementById("subnote").innerHTML =
       "&bull; OPPONENT DEFENSE ALLOWED, PER GAME<br>&bull; " +
@@ -173,7 +174,7 @@
           td.textContent = fmtNum(val, /%/.test(headers[ci] || ""));
           td.className = "cs";
           var n = parseFloat(String(val).replace("%", ""));
-          if (!isNaN(n)) {
+           if (!isNaN(n) && (d.plain || []).indexOf(ci) === -1) {
             var lo = colMin[ci], hi = colMax[ci];
             var inv = (d.invert || []).indexOf(ci) !== -1;
             td.style.background = getColor(inv ? (lo + hi - n) : n, lo, hi);
