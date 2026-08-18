@@ -33,7 +33,7 @@
   .group-header-row th.def-header { background: #ffe8c8; color: #7d3c00; }
 
   .col-headers th { background: #0d3349; color: #ffffff; font-family: "Oswald", sans-serif; font-size: 10px; font-weight: 600; text-align: center; padding: 7px 3px; letter-spacing: 0.3px; border-bottom: 2px solid #00c8e0; }
-  .col-headers th.left { text-align: left; padding-left: 8px; }
+  .col-headers th.left { text-align: center; padding-left: 0; }
 
   tbody tr.pair-a { background: #ffffff; }
   tbody tr.pair-b { background: #eaf6fd; }
@@ -117,8 +117,9 @@
     document.getElementById("card").style.width = (d.cardWidth || 1000) + "px";
     document.getElementById("title-pos").textContent = (d.title || "NFL TARGETS").replace("NFL ", "NFL ");
     document.getElementById("subnote").innerHTML =
-      "&bull; OPPONENT DEFENSE ALLOWED, PER GAME<br>&bull; " +
-      (d.season || "") + " SEASON" + (d.week ? " &bull; WEEK " + d.week : "");
+      "&bull; OPPONENT DEFENSE ALLOWED, PER GAME<br>&bull; " + (d.season || "") +
+      (d.week ? " &bull; WEEK " + d.week : "") +
+      "<br>&bull; <b>GREEN</b> = ALLOWS MORE (TARGET) &nbsp;·&nbsp; <b>RED</b> = TOUGH SPOT &nbsp;·&nbsp; INT REVERSED";
 
     var today = new Date();
     document.getElementById("date-badge").textContent =
