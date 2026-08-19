@@ -108,8 +108,7 @@
   function fmtNum(v, isPct) {
     var n = parseFloat(String(v).replace("%", ""));
     if (isNaN(n)) return "N/A";
-    if (isPct) return (n <= 1 ? n * 100 : n).toFixed(0) + "%";
-    return (Math.round(n) === n) ? String(n) : n.toFixed(2);
+    if (isPct) return (n <= 1 ? n * 100 : n).toFixed(2) + "%";
   }
 
   function render(d) {
