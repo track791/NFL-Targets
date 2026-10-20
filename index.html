@@ -96,13 +96,21 @@
   var POS = (qs("pos") || "qb").toUpperCase();
 
   // Higher allowed = better matchup = green. Same direction as the MLB HR sheet.
-  function getColor(val, min, max) {
-    if (isNaN(val)) return "";
-    var t = (max === min) ? 0.5 : (val - min) / (max - min);
+  function getColorT(t) {
     var r, g, b, s;
     if (t < 0.5) { s = t * 2;         r = Math.round(230 + (255-230)*s); g = Math.round(124 + (255-124)*s); b = Math.round(115 + (255-115)*s); }
     else         { s = (t - 0.5) * 2; r = Math.round(255 + ( 87-255)*s); g = Math.round(255 + (187-255)*s); b = Math.round(255 + (138-255)*s); }
     return "rgb(" + r + "," + g + "," + b + ")";
+  }
+
+  function pctRank(val, sorted) {
+    if (!sorted || sorted.length < 2) return 0.5;
+    var lo = 0, hi = 0;
+    for (var i = 0; i < sorted.length; i++) {
+      if (sorted[i] <  val) lo++;
+      if (sorted[i] <= val) hi++;
+    }
+    return ((lo + hi) / 2) / sorted.length;   // mid-rank handles ties
   }
 
   function fmtNum(v, isPct) {
@@ -155,15 +163,13 @@
       headRow.appendChild(th);
     });
 
-    // Column min/max for the heat map.
-    var colMin = {}, colMax = {};
+        // Percentile rank per column for the heat map.
+    var colSorted = {};
     numeric.forEach(function (ci) {
-      var vals = rows.map(function (r) { return parseFloat(String(r[ci]).replace("%", "")); })
-                     .filter(function (v) { return !isNaN(v); });
-      colMin[ci] = vals.length ? Math.min.apply(null, vals) : 0;
-      colMax[ci] = vals.length ? Math.max.apply(null, vals) : 1;
+      colSorted[ci] = rows.map(function (r) { return parseFloat(String(r[ci]).replace("%", "")); })
+                          .filter(function (v) { return !isNaN(v); })
+                          .sort(function (a, b) { return a - b; });
     });
-
     var tbody = document.getElementById("table-body");
     tbody.innerHTML = "";
     var pairIdx = {}, pairCount = 0;
@@ -178,10 +184,10 @@
           td.textContent = fmtNum(val, /%/.test(headers[ci] || ""));
           td.className = "cs";
           var n = parseFloat(String(val).replace("%", ""));
-           if (!isNaN(n) && (d.plain || []).indexOf(ci) === -1) {
-            var lo = colMin[ci], hi = colMax[ci];
-            var inv = (d.invert || []).indexOf(ci) !== -1;
-            td.style.background = getColor(inv ? (lo + hi - n) : n, lo, hi);
+          if (!isNaN(n) && (d.plain || []).indexOf(ci) === -1) {
+            var t = pctRank(n, colSorted[ci]);
+            if ((d.invert || []).indexOf(ci) !== -1) t = 1 - t;
+            td.style.background = getColorT(t);
           }
         } else if (ci === 0) {
           td.textContent = val; td.className = "tm-cell";
